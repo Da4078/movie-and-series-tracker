@@ -1,11 +1,11 @@
 package org.daniel.moviesandseriestrackermaster.controller;
 
+import org.daniel.moviesandseriestrackermaster.dto.UserDTO;
 import org.daniel.moviesandseriestrackermaster.models.User;
 import org.daniel.moviesandseriestrackermaster.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -19,14 +19,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        Optional<User> existing = userService.getUserByEmail(user.getEmail());
-        if (existing.isPresent()) {
-            return ResponseEntity.ok(existing.get());
-        }
-
-        User created = userService.createUser(user);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.createUser(userDTO));
     }
 
     @GetMapping("/{id}")
@@ -35,4 +29,5 @@ public class UserController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
 }

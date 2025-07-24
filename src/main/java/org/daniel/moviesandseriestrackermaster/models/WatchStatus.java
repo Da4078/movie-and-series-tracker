@@ -20,18 +20,19 @@ public class WatchStatus {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movie_id", nullable = false)
+    @JoinColumn(name = "movie_id", nullable = true)
     private Movie movie;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "series_id", nullable = false)
+    @JoinColumn(name = "series_id", nullable = true)
     private Series series;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private WatchStatusEnum status;
+    private WatchStatusEnum watchStatusEnum;
+
+
 }

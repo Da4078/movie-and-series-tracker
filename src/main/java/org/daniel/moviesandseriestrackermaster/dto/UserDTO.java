@@ -4,16 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StatusDTO {
-    private UUID contentId;
-    private String contentType;
-    private WatchStatusEnum status;
+public class UserDTO {
+
+    private UUID id;
+    private String name;
+    private String email;
+    private List<WatchStatusDTO> watchStatuses;
 }

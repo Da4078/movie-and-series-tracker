@@ -1,33 +1,37 @@
-package org.daniel.moviesandseriestrackermaster.service;
+    package org.daniel.moviesandseriestrackermaster.service;
 
-import org.daniel.moviesandseriestrackermaster.models.User;
-import org.daniel.moviesandseriestrackermaster.repository.UserRepository;
-import org.springframework.stereotype.Service;
+    import org.daniel.moviesandseriestrackermaster.dto.UserDTO;
+    import org.daniel.moviesandseriestrackermaster.models.User;
+    import org.daniel.moviesandseriestrackermaster.repository.UserRepository;
+    import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
+    import java.util.Optional;
+    import java.util.UUID;
 
-@Service
-public class UserService {
+    @Service
+    public class UserService {
 
-    private final UserRepository userRepo;
+        private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepo) {
-        this.userRepo = userRepo;
+        public UserService(UserRepository userRepository) {
+            this.userRepository = userRepository;
+        }
+
+        public User createUser(UserDTO userDTO) {
+           if(userRepository.existsByEmail(userDTO.getEmail())){
+               throw new IllegalArgumentException("Email is taken");
+           }
+
+           User user = new User();
+           user.setName(userDTO.getName());
+           user.setEmail(userDTO.getEmail());
+
+           return userRepository.save(user);
+        }
+
+        public Optional<User> getUserById(UUID id) {
+            return userRepository.findById(id);
+        }
+
+
     }
-
-    public User createUser(User user) {
-        return userRepo.save(user);
-    }
-
-    public Optional<User> getUserById(UUID id) {
-        return userRepo.findById(id);
-    }
-
-    public Optional<User> getUserByEmail(String email) {
-        return userRepo.findAll()
-                .stream()
-                .filter(u -> u.getEmail().equalsIgnoreCase(email))
-                .findFirst();
-    }
-}

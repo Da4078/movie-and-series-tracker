@@ -2,6 +2,9 @@ package org.daniel.moviesandseriestrackermaster.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.daniel.moviesandseriestrackermaster.enums.ContentTypeEnum;
+import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
+import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +29,7 @@ public class Series {
     @ElementCollection
     @CollectionTable(name = "series_genres", joinColumns = @JoinColumn(name="series_id"))
     @Column(name="genre")
-    private List<String> genre;
+    private List<GenreEnum> genres;
 
     @Column(nullable = false)
     private String creator;
@@ -37,8 +40,6 @@ public class Series {
     @Column(name = "start_year", nullable = false)
     private int startYear;
 
-    @OneToMany(mappedBy = "series", cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    private List<WatchStatus> watchStatuses = new ArrayList<>();
-
+    @Enumerated(EnumType.STRING)
+    private final ContentTypeEnum contentType = ContentTypeEnum.SERIES;
 }

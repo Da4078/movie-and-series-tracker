@@ -5,6 +5,8 @@ import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.repository.MovieRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -15,10 +17,21 @@ public class MovieService {
         this.movieRepository = movieRepository;
     }
 
+    public List<Movie> getAllMovies(){
+        return movieRepository.findAll();
+    }
+    public Optional<Movie> getMovieById(UUID id){
+        Optional<Movie> movie = movieRepository.findById(id);
+        if(movie.isEmpty()){
+            throw new IllegalStateException("Movie with id: " + id + "not found");
+        }
+        return movieRepository.findById(id);
+    }
+
     public Movie createMovie(MovieDTO movieDTO){
         Movie movie = Movie.builder()
                 .title(movieDTO.getTitle())
-                .genre(movieDTO.getGenres())
+                .genres(movieDTO.getGenres())
                 .director(movieDTO.getDirector())
                 .releaseYear(movieDTO.getReleaseYear())
                 .description(movieDTO.getDescription())
@@ -28,9 +41,10 @@ public class MovieService {
     }
 
     public Movie updateMovie(UUID id, MovieDTO movieDTO){
-        Movie existing = movieRepository.findById(id).orElseThrow(()-> new IllegalStateException("Movie not found: " + id));
+        Movie existing = movieRepository.findById(id)
+                .orElseThrow(()-> new IllegalStateException("Movie not found: " + id));
         existing.setTitle(movieDTO.getTitle());
-        existing.setGenre(movieDTO.getGenres());
+        existing.setGenres(movieDTO.getGenres());
         existing.setDirector(movieDTO.getDirector());
         existing.setReleaseYear(movieDTO.getReleaseYear());
         existing.setDescription(movieDTO.getDescription());
