@@ -1,5 +1,6 @@
 package org.daniel.moviesandseriestrackermaster.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.daniel.moviesandseriestrackermaster.enums.ContentTypeEnum;
@@ -42,4 +43,8 @@ public class Series {
 
     @Enumerated(EnumType.STRING)
     private final ContentTypeEnum contentType = ContentTypeEnum.SERIES;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<WatchStatus> watchStatuses;
 }

@@ -1,5 +1,8 @@
 package org.daniel.moviesandseriestrackermaster.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.daniel.moviesandseriestrackermaster.enums.ContentTypeEnum;
@@ -17,6 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @ToString
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Movie {
 
     @Id
@@ -43,7 +47,10 @@ public class Movie {
     @Column(nullable = false)
     private int duration;
 
-
     @Enumerated(EnumType.STRING)
     private final ContentTypeEnum contentType = ContentTypeEnum.MOVIE;
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<WatchStatus> watchStatuses;
 }

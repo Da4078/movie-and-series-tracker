@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,7 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class MovieDTO {
 
-    private UUID id;
     private String title;
     private List<GenreEnum> genres;
     private String director;
