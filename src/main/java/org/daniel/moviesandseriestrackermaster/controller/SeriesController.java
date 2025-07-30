@@ -39,6 +39,11 @@ public class SeriesController {
         return ResponseEntity.ok(seriesService.getSeriesById(id));
     }
 
+    @GetMapping("/title/{title}")
+    public ResponseEntity<List<Series>> findByTitle(@PathVariable String title){
+        return ResponseEntity.ok(seriesService.getSeriesByTitle(title));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Series> update(@PathVariable UUID id, @RequestBody SeriesDTO seriesDTO){
         Series updated = seriesService.updateSeries(id, seriesDTO);

@@ -34,6 +34,11 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getMovieById(id));
     }
 
+    @GetMapping("/title/{title}")
+    public ResponseEntity<List<Movie>> findByTitle(@PathVariable String title){
+        return ResponseEntity.ok(movieService.getMovieByTitle(title));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Movie> update(@PathVariable UUID id, @RequestBody MovieDTO movieDTO){
         return ResponseEntity.ok(movieService.updateMovie(id, movieDTO));

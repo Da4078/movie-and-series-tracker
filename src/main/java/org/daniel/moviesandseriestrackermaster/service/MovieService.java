@@ -31,6 +31,13 @@ public class MovieService {
         return movieRepository.findById(id);
     }
 
+    public List<Movie> getMovieByTitle(String title){
+        if(movieRepository.findByTitle(title).isEmpty()){
+            throw new IllegalStateException("Title " + title + "not found");
+        }
+        return movieRepository.findByTitle(title);
+    }
+
     public Movie createMovie(MovieDTO movieDTO){
         Movie movie = Movie.builder()
                 .title(movieDTO.getTitle())

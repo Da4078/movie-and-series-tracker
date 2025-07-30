@@ -30,6 +30,13 @@ public class SeriesService {
         return seriesRepository.findById(id);
     }
 
+    public List<Series> getSeriesByTitle(String title){
+        if(seriesRepository.findByTitle(title).isEmpty()){
+            throw new IllegalStateException("Title " + title + "not found");
+        }
+        return seriesRepository.findByTitle(title);
+    }
+
 
     public Series createSeries(SeriesDTO seriesDTO){
         Series series = Series.builder()
