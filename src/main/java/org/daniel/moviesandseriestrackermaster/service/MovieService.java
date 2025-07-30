@@ -1,6 +1,7 @@
 package org.daniel.moviesandseriestrackermaster.service;
 
 import org.daniel.moviesandseriestrackermaster.dto.MovieDTO;
+import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.repository.MovieRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ public class MovieService {
     public List<Movie> getAllMovies(){
         return movieRepository.findAll();
     }
+
+
     public Optional<Movie> getMovieById(UUID id){
         Optional<Movie> movie = movieRepository.findById(id);
         if(movie.isEmpty()){

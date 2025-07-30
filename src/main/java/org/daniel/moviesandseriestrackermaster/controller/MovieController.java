@@ -1,18 +1,18 @@
 package org.daniel.moviesandseriestrackermaster.controller;
 
 import org.daniel.moviesandseriestrackermaster.dto.MovieDTO;
+import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.service.MovieService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
+
     private final MovieService movieService;
 
     public MovieController(MovieService movieService) {

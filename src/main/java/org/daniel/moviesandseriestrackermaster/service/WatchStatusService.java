@@ -1,6 +1,6 @@
 package org.daniel.moviesandseriestrackermaster.service;
 
-import org.daniel.moviesandseriestrackermaster.dto.WatchStatusDTO;
+import jakarta.transaction.Transactional;
 import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.models.Series;
@@ -12,6 +12,7 @@ import org.daniel.moviesandseriestrackermaster.repository.UserRepository;
 import org.daniel.moviesandseriestrackermaster.repository.WatchStatusRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,7 +40,6 @@ public class WatchStatusService {
 
         WatchStatus watchStatus = new WatchStatus();
 
-
         if(movie.isPresent()){
             watchStatus.setMovie(movie.get());
         } else if(series.isPresent()){
@@ -51,5 +51,15 @@ public class WatchStatusService {
         watchStatus.setWatchStatusEnum(watchStatusEnum);
 
         return watchStatusRepository.save(watchStatus);
+    }
+
+    @Transactional
+    public List<WatchStatus> filterByStatus(UUID userId,
+                                            WatchStatusEnum watchStatusEnum){
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("User not found"));
+
+        return watchStatusRepository.findByUserAndWatchStatusEnum(user, watchStatusEnum);
     }
 }

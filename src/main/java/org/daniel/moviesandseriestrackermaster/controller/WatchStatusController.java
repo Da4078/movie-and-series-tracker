@@ -1,11 +1,13 @@
         package org.daniel.moviesandseriestrackermaster.controller;
 
         import org.daniel.moviesandseriestrackermaster.dto.WatchStatusDTO;
+        import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
         import org.daniel.moviesandseriestrackermaster.models.WatchStatus;
         import org.daniel.moviesandseriestrackermaster.service.WatchStatusService;
         import org.springframework.http.ResponseEntity;
         import org.springframework.web.bind.annotation.*;
 
+        import java.util.List;
         import java.util.UUID;
 
         @RestController
@@ -26,4 +28,14 @@
                     return ResponseEntity.ok(watchStatusService
                             .markStatus(userId, contentId, watchStatusDTO.getWatchStatusEnum()));
                 }
+
+                @GetMapping("/{userId}/{status}")
+            public ResponseEntity<List<WatchStatus>> getByStatus(
+                        @PathVariable UUID userId,
+                        @PathVariable WatchStatusEnum status
+                        ){
+                return ResponseEntity.ok(watchStatusService
+                        .filterByStatus(userId, status));
+                }
+
         }

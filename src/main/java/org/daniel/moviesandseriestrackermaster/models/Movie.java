@@ -1,13 +1,11 @@
 package org.daniel.moviesandseriestrackermaster.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.daniel.moviesandseriestrackermaster.enums.ContentTypeEnum;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
-import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +28,7 @@ public class Movie {
     @Column(nullable = false)
     private String title;
 
+    @ElementCollection
     @CollectionTable(name = "movie_genres", joinColumns = @JoinColumn(name="movie_id"))
     @Column(name="genre", nullable = false)
     @Enumerated(EnumType.STRING)

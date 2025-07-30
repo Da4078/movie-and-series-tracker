@@ -14,7 +14,7 @@ public enum GenreEnum {
     HORROR,
     MYSTERY,
     ROMANCE,
-    SCIFI,
+    SCI_FI,
     SPORT,
     THRILLER,
     WAR,

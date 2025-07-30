@@ -4,8 +4,10 @@ import org.daniel.moviesandseriestrackermaster.dto.SeriesDTO;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.models.Series;
 import org.daniel.moviesandseriestrackermaster.service.SeriesService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +17,6 @@ import java.util.UUID;
 @RequestMapping("/api/series")
 public class SeriesController {
 
-    //TODO: Implement swagger to test api
     private final SeriesService seriesService;
 
     public SeriesController(SeriesService seriesService) {

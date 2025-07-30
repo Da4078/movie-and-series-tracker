@@ -44,7 +44,7 @@ public class Series {
     @Enumerated(EnumType.STRING)
     private final ContentTypeEnum contentType = ContentTypeEnum.SERIES;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "series", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<WatchStatus> watchStatuses;
 }

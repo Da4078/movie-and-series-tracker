@@ -21,6 +21,7 @@ public class SeriesService {
     public List<Series> getAllSeries(){
         return seriesRepository.findAll();
     }
+
     public Optional<Series> getSeriesById(UUID id){
         Optional<Series> series = seriesRepository.findById(id);
         if(series.isEmpty()){
@@ -28,6 +29,7 @@ public class SeriesService {
         }
         return seriesRepository.findById(id);
     }
+
 
     public Series createSeries(SeriesDTO seriesDTO){
         Series series = Series.builder()
