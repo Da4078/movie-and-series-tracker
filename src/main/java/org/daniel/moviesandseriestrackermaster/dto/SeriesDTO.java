@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
-import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
-import org.daniel.moviesandseriestrackermaster.models.WatchStatus;
 
 import java.util.List;
 

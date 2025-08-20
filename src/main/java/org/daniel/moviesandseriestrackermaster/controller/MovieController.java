@@ -7,7 +7,9 @@ import org.daniel.moviesandseriestrackermaster.service.MovieService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -24,19 +26,22 @@ public class MovieController {
         return ResponseEntity.ok(movieService.createMovie(movieDTO));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Movie>> getAll(){
-        return ResponseEntity.ok(movieService.getAllMovies());
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Movie>> findById(@PathVariable UUID id){
         return ResponseEntity.ok(movieService.getMovieById(id));
     }
 
-    @GetMapping("/title/{title}")
-    public ResponseEntity<List<Movie>> findByTitle(@PathVariable String title){
-        return ResponseEntity.ok(movieService.getMovieByTitle(title));
+    @GetMapping("/filter")
+    public ResponseEntity<List<Movie>> filterMovies(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) GenreEnum genreEnum,
+            @RequestParam(required = false) String director,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ){
+        return ResponseEntity.ok(movieService
+                .getMovies(title, genreEnum, director, sortBy, direction));
     }
 
     @PutMapping("/{id}")

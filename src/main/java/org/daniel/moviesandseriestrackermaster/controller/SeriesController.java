@@ -1,13 +1,11 @@
 package org.daniel.moviesandseriestrackermaster.controller;
 
 import org.daniel.moviesandseriestrackermaster.dto.SeriesDTO;
-import org.daniel.moviesandseriestrackermaster.models.Movie;
+import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 import org.daniel.moviesandseriestrackermaster.models.Series;
 import org.daniel.moviesandseriestrackermaster.service.SeriesService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,19 +27,21 @@ public class SeriesController {
         return ResponseEntity.ok(created);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Series>> getAll(){
-        return ResponseEntity.ok(seriesService.getAllSeries());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Series>> findById(@PathVariable UUID id){
         return ResponseEntity.ok(seriesService.getSeriesById(id));
     }
 
-    @GetMapping("/title/{title}")
-    public ResponseEntity<List<Series>> findByTitle(@PathVariable String title){
-        return ResponseEntity.ok(seriesService.getSeriesByTitle(title));
+    @GetMapping("/filter")
+    public ResponseEntity<List<Series>> filterSeries(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false)GenreEnum genreEnum,
+            @RequestParam(required = false) String creator,
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+            ){
+        return ResponseEntity.ok(seriesService
+                .getSeries(title, genreEnum, creator, sortBy, direction));
     }
 
     @PutMapping("/{id}")

@@ -1,11 +1,13 @@
 package org.daniel.moviesandseriestrackermaster.controller;
 
+import jakarta.validation.Valid;
 import org.daniel.moviesandseriestrackermaster.dto.UserDTO;
 import org.daniel.moviesandseriestrackermaster.models.User;
 import org.daniel.moviesandseriestrackermaster.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +30,11 @@ public class UserController {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Optional<User>> findByEmail(@Valid @PathVariable String email){
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
 

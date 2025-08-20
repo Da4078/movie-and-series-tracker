@@ -4,6 +4,7 @@ import org.daniel.moviesandseriestrackermaster.dto.MovieDTO;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.repository.MovieRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,28 +15,37 @@ import java.util.UUID;
 public class MovieService {
     private final MovieRepository movieRepository;
 
+    //TODO: DO this one last. Learn to write simple unit tests.
+    // Write tests for this service class.
+    // Use H2 database, use junit5, use mockito, etc... You wil find everything online :D
+    // Good Luck!
+
     public MovieService(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
     }
-
-    public List<Movie> getAllMovies(){
-        return movieRepository.findAll();
-    }
-
 
     public Optional<Movie> getMovieById(UUID id){
         Optional<Movie> movie = movieRepository.findById(id);
         if(movie.isEmpty()){
             throw new IllegalStateException("Movie with id: " + id + "not found");
         }
-        return movieRepository.findById(id);
+        return movie;
     }
 
-    public List<Movie> getMovieByTitle(String title){
-        if(movieRepository.findByTitle(title).isEmpty()){
-            throw new IllegalStateException("Title " + title + "not found");
+    public List<Movie> getMovies(String title, GenreEnum genreEnum, String director,
+                                  String sortBy, String direction){
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy)
+                .descending() : Sort.by(sortBy).ascending();
+
+        if(title != null){
+            return movieRepository.findByTitleContainingIgnoreCase(title);
+        } else if (director != null){
+            return movieRepository.findByDirector(director);
+        } else if (genreEnum != null){
+            return movieRepository.findByGenres(genreEnum);
+        } else{
+            return movieRepository.findAll(sort);
         }
-        return movieRepository.findByTitle(title);
     }
 
     public Movie createMovie(MovieDTO movieDTO){

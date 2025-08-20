@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.daniel.moviesandseriestrackermaster.enums.ContentTypeEnum;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
-import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 

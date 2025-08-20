@@ -1,6 +1,5 @@
 package org.daniel.moviesandseriestrackermaster.service;
 
-import jakarta.transaction.Transactional;
 import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.models.Series;
@@ -53,7 +52,6 @@ public class WatchStatusService {
         return watchStatusRepository.save(watchStatus);
     }
 
-    @Transactional
     public List<WatchStatus> filterByStatus(UUID userId,
                                             WatchStatusEnum watchStatusEnum){
 

@@ -1,8 +1,10 @@
 package org.daniel.moviesandseriestrackermaster.service;
 
 import org.daniel.moviesandseriestrackermaster.dto.SeriesDTO;
+import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 import org.daniel.moviesandseriestrackermaster.models.Series;
 import org.daniel.moviesandseriestrackermaster.repository.SeriesRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +20,6 @@ public class SeriesService {
         this.seriesRepository = seriesRepository;
     }
 
-    public List<Series> getAllSeries(){
-        return seriesRepository.findAll();
-    }
-
     public Optional<Series> getSeriesById(UUID id){
         Optional<Series> series = seriesRepository.findById(id);
         if(series.isEmpty()){
@@ -30,13 +28,21 @@ public class SeriesService {
         return seriesRepository.findById(id);
     }
 
-    public List<Series> getSeriesByTitle(String title){
-        if(seriesRepository.findByTitle(title).isEmpty()){
-            throw new IllegalStateException("Title " + title + "not found");
-        }
-        return seriesRepository.findByTitle(title);
-    }
+    public List<Series> getSeries(String title, GenreEnum genreEnum, String creator,
+                                  String sortBy, String direction){
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy)
+                .descending() : Sort.by(sortBy).ascending();
 
+        if(title != null){
+            return seriesRepository.findByTitleContainingIgnoreCase(title);
+        } else if (creator != null){
+            return seriesRepository.findByCreator(creator);
+        } else if (genreEnum != null){
+            return seriesRepository.findByGenres(genreEnum);
+        } else{
+            return seriesRepository.findAll(sort);
+        }
+    }
 
     public Series createSeries(SeriesDTO seriesDTO){
         Series series = Series.builder()
@@ -49,8 +55,6 @@ public class SeriesService {
         return seriesRepository.save(series);
     }
 
-    //TODO: Instead of using IllegalStateException we not some like NotFoundException a custom one.
-    // You can see on google how to make exceptions out of https code like 404 not found
     public Series updateSeries(UUID id, SeriesDTO seriesDTO){
         Series existing = seriesRepository.findById(id)
                 .orElseThrow(()-> new IllegalStateException("Series not found: " + id));

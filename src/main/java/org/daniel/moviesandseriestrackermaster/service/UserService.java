@@ -1,6 +1,7 @@
     package org.daniel.moviesandseriestrackermaster.service;
 
     import org.daniel.moviesandseriestrackermaster.dto.UserDTO;
+    import org.daniel.moviesandseriestrackermaster.exception.BadRequestException;
     import org.daniel.moviesandseriestrackermaster.models.User;
     import org.daniel.moviesandseriestrackermaster.repository.UserRepository;
     import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@
 
         public User createUser(UserDTO userDTO) {
            if(userRepository.existsByEmail(userDTO.getEmail())){
-               throw new IllegalArgumentException("Email is taken");
+               throw new BadRequestException("Email is already taken");
            }
 
            User user = new User();
@@ -36,6 +37,5 @@
         public Optional<User> getUserByEmail(String email){
             return userRepository.findByEmail(email);
         }
-
 
     }
