@@ -15,11 +15,6 @@ import java.util.UUID;
 public class MovieService {
     private final MovieRepository movieRepository;
 
-    //TODO: DO this one last. Learn to write simple unit tests.
-    // Write tests for this service class.
-    // Use H2 database, use junit5, use mockito, etc... You wil find everything online :D
-    // Good Luck!
-
     public MovieService(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
     }
@@ -35,7 +30,7 @@ public class MovieService {
     public List<Movie> getMovies(String title, GenreEnum genreEnum, String director,
                                   String sortBy, String direction){
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy)
-                .descending() : Sort.by(sortBy).ascending();
+                .descending() : Sort.by(sortBy).ascending();    
 
         if(title != null){
             return movieRepository.findByTitleContainingIgnoreCase(title);
