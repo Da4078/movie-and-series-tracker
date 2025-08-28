@@ -4,12 +4,16 @@ import org.daniel.moviesandseriestrackermaster.dto.MovieDTO;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.repository.MovieRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 
 @Service
 public class MovieService {
@@ -27,20 +31,35 @@ public class MovieService {
         return movie;
     }
 
-    public List<Movie> getMovies(String title, GenreEnum genreEnum, String director,
-                                  String sortBy, String direction){
+    public Page<Movie> getMovies(String title, GenreEnum genreEnum, String director,
+                                 String sortBy, String direction, int page, int size){
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy)
-                .descending() : Sort.by(sortBy).ascending();    
+                .descending() : Sort.by(sortBy).ascending();
 
-        if(title != null){
-            return movieRepository.findByTitleContainingIgnoreCase(title);
-        } else if (director != null){
-            return movieRepository.findByDirector(director);
-        } else if (genreEnum != null){
-            return movieRepository.findByGenres(genreEnum);
-        } else{
-            return movieRepository.findAll(sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Movie> spec = null;
+
+        //TODO: investiget pageable, specification and other ways to do this and choose best one
+        if (title != null && !title.isBlank()) {
+            Specification<Movie> titleSpec = (root, query, cb) ->
+                    cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
+            spec = (spec == null) ? titleSpec : spec.and(titleSpec);
         }
+
+        if (director != null && !director.isBlank()) {
+            Specification<Movie> directorSpec = (root, query, cb) ->
+                    cb.equal(root.get("director"), director);
+            spec = (spec == null) ? directorSpec : spec.and(directorSpec);
+        }
+
+        if (genreEnum != null) {
+            Specification<Movie> genreSpec = (root, query, cb) ->
+                    cb.equal(root.get("genres"), genreEnum);
+            spec = (spec == null) ? genreSpec : spec.and(genreSpec);
+        }
+
+        return movieRepository.findAll(spec, pageable);
     }
 
     public Movie createMovie(MovieDTO movieDTO){

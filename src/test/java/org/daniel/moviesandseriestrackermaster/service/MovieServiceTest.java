@@ -8,10 +8,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +39,7 @@ class MovieServiceTest {
     private MovieDTO movieDTO;
 
     @BeforeEach
-    void setUp() {
+    void set_up() {
         id = UUID.fromString("578ad8cf-fcd2-4e43-8deb-926d496f1996");
         movie = Movie.builder()
                 .id(id)
@@ -57,7 +61,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void createMovie(){
+    void should_create_movie(){
         when(movieRepository.save(any(Movie.class))).thenReturn(movie);
         Movie result = movieService.createMovie(movieDTO);
 
@@ -72,7 +76,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void GetMovieById_IsPresent() {
+    void should_get_movie_by_id() {
         when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
 
         Optional<Movie> result = movieService.getMovieById(id);
@@ -84,7 +88,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void GetMovieById_IsEmpty(){
+    void should_not_get_movie_by_id(){
         when(movieRepository.findById(id)).thenReturn(Optional.empty());
         IllegalStateException exception = assertThrows(IllegalStateException.class,
                 () -> movieService.getMovieById(id));
@@ -92,56 +96,37 @@ class MovieServiceTest {
     }
 
     @Test
-    void getMoviesByTitle(){
-        when(movieRepository.findByTitleContainingIgnoreCase("incep"))
-                .thenReturn(List.of(movie));
+    void should_get_movies_with_filters() {
+        when(movieRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(movie)));
 
-        List<Movie> result = movieService.getMovies("incep", null,
-                null, "title", "asc");
+        Page<Movie> result = movieService.getMovies(
+                "incep", GenreEnum.SCI_FI, "Nolan", "title", "asc", 0, 10);
 
-        assertEquals(1, result.size());
-        verify(movieRepository).findByTitleContainingIgnoreCase("incep");
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertEquals("Inception", result.getContent().get(0).getTitle());
+
+        verify(movieRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test
-    void getMoviesByDirector(){
-        when(movieRepository.findByDirector("Nolan"))
-                .thenReturn(List.of(movie));
+    void should_get_movies_without_filters() {
 
-        List<Movie> result = movieService.getMovies(null, null,
-                "Nolan", "title", "asc");
+        when(movieRepository.findAll(ArgumentMatchers.<Specification<Movie>>any(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(movie)));
 
-        assertEquals(1, result.size());
-        verify(movieRepository).findByDirector("Nolan");
+        Page<Movie> result = movieService.getMovies(
+                null, null, null, "title", "desc", 0, 10);
+
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+
+        verify(movieRepository).findAll(ArgumentMatchers.<Specification<Movie>>any(), any(Pageable.class));
     }
 
     @Test
-    void getMoviesByGenre(){
-        when(movieRepository.findByGenres(GenreEnum.SCI_FI))
-                .thenReturn(List.of(movie));
-
-        List<Movie> result = movieService.getMovies(null, GenreEnum.SCI_FI,
-                null, "title", "asc");
-
-        assertEquals(1, result.size());
-        verify(movieRepository).findByGenres(GenreEnum.SCI_FI);
-    }
-
-    @Test
-    void getMovies(){
-        when(movieRepository.findAll(any(Sort.class)))
-                .thenReturn(List.of(movie));
-
-
-        List<Movie> result = movieService.getMovies(null, null,
-                null, "title", "desc");
-
-        assertEquals(1, result.size());
-        verify(movieRepository).findAll(any(Sort.class));
-    }
-
-    @Test
-    void updateMovie_Exists(){
+    void should_update_movie(){
         when(movieRepository.findById(id)).thenReturn(Optional.of(movie));
         when(movieRepository.save(any(Movie.class))).thenReturn(movie);
 
@@ -154,7 +139,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void updateMovie_notExists(){
+    void should_not_update_movie(){
         when(movieRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(IllegalStateException.class, () -> movieService.updateMovie(id, movieDTO));
@@ -162,7 +147,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void deleteMovie(){
+    void should_delete_movie(){
         when(movieRepository.existsById(id)).thenReturn(true);
 
         movieService.deleteMovie(id);
@@ -171,7 +156,7 @@ class MovieServiceTest {
     }
 
     @Test
-    void deleteMovie_notExists(){
+    void should_not_delete_movie(){
         when(movieRepository.existsById(id)).thenReturn(false);
 
         assertThrows(IllegalStateException.class, () -> movieService.deleteMovie(id));

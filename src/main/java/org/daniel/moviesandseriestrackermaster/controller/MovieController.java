@@ -4,10 +4,10 @@ import org.daniel.moviesandseriestrackermaster.dto.MovieDTO;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
 import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.service.MovieService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,15 +33,17 @@ public class MovieController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<Movie>> filterMovies(
+    public ResponseEntity<Page<Movie>> filterMovies(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) GenreEnum genreEnum,
             @RequestParam(required = false) String director,
             @RequestParam(defaultValue = "title") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ){
         return ResponseEntity.ok(movieService
-                .getMovies(title, genreEnum, director, sortBy, direction));
+                .getMovies(title, genreEnum, director, sortBy, direction, page, size));
     }
 
     @PutMapping("/{id}")

@@ -15,6 +15,7 @@ import java.util.UUID;
 @Table(name="app_user")
 @Getter
 @Setter
+@Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor

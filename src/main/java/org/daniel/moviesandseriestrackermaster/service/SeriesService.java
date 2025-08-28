@@ -2,9 +2,14 @@ package org.daniel.moviesandseriestrackermaster.service;
 
 import org.daniel.moviesandseriestrackermaster.dto.SeriesDTO;
 import org.daniel.moviesandseriestrackermaster.enums.GenreEnum;
+import org.daniel.moviesandseriestrackermaster.models.Movie;
 import org.daniel.moviesandseriestrackermaster.models.Series;
 import org.daniel.moviesandseriestrackermaster.repository.SeriesRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,23 +30,38 @@ public class SeriesService {
         if(series.isEmpty()){
             throw new IllegalStateException("Series with id: " + id + "not found");
         }
-        return seriesRepository.findById(id);
+        return series;
     }
 
-    public List<Series> getSeries(String title, GenreEnum genreEnum, String creator,
-                                  String sortBy, String direction){
+    public Page<Series> getSeries(String title, GenreEnum genreEnum, String creator,
+                                 String sortBy, String direction, int page, int size){
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy)
                 .descending() : Sort.by(sortBy).ascending();
 
-        if(title != null){
-            return seriesRepository.findByTitleContainingIgnoreCase(title);
-        } else if (creator != null){
-            return seriesRepository.findByCreator(creator);
-        } else if (genreEnum != null){
-            return seriesRepository.findByGenres(genreEnum);
-        } else{
-            return seriesRepository.findAll(sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Series> spec = null;
+
+        //TODO: investiget pageable, specification and other ways to do this and choose best one
+        if (title != null && !title.isBlank()) {
+            Specification<Series> titleSpec = (root, query, cb) ->
+                    cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
+            spec = (spec == null) ? titleSpec : spec.and(titleSpec);
         }
+
+        if (creator != null && !creator.isBlank()) {
+            Specification<Series> creatorSpec = (root, query, cb) ->
+                    cb.equal(root.get("director"), creator);
+            spec = (spec == null) ? creatorSpec : spec.and(creatorSpec);
+        }
+
+        if (genreEnum != null) {
+            Specification<Series> genreSpec = (root, query, cb) ->
+                    cb.equal(root.get("genres"), genreEnum);
+            spec = (spec == null) ? genreSpec : spec.and(genreSpec);
+        }
+
+        return seriesRepository.findAll(spec, pageable);
     }
 
     public Series createSeries(SeriesDTO seriesDTO){
