@@ -42,7 +42,6 @@ public class SeriesService {
 
         Specification<Series> spec = null;
 
-        //TODO: investiget pageable, specification and other ways to do this and choose best one
         if (title != null && !title.isBlank()) {
             Specification<Series> titleSpec = (root, query, cb) ->
                     cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%");
