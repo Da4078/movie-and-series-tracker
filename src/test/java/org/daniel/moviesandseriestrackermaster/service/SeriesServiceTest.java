@@ -40,7 +40,7 @@ public class SeriesServiceTest {
 
     @BeforeEach
     void set_up(){
-        id = UUID.fromString("578ad8cf-fcd2-4e43-8deb-926d496f1996");
+        id = UUID.randomUUID();
         series = Series.builder()
                 .id(id)
                 .title("Breaking Bad")

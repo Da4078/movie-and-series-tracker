@@ -28,8 +28,10 @@ public class MovieController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Movie>> findById(@PathVariable UUID id){
-        return ResponseEntity.ok(movieService.getMovieById(id));
+    public ResponseEntity<Movie> findById(@PathVariable UUID id){
+        return movieService.getMovieById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/filter")

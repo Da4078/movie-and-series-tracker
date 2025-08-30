@@ -23,13 +23,14 @@ public class SeriesController {
 
     @PostMapping
     public ResponseEntity<Series> create(@RequestBody SeriesDTO seriesDTO){
-        Series created = seriesService.createSeries(seriesDTO);
-        return ResponseEntity.ok(created);
+        return ResponseEntity.ok(seriesService.createSeries(seriesDTO));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Series>> findById(@PathVariable UUID id){
-        return ResponseEntity.ok(seriesService.getSeriesById(id));
+    public ResponseEntity<Series> findById(@PathVariable UUID id){
+        return seriesService.getSeriesById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/filter")

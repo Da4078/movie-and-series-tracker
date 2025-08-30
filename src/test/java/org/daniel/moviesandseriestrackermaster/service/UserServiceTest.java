@@ -35,7 +35,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void set_up(){
-        id = UUID.fromString("578ad8cf-fcd2-4e43-8deb-926d496f1996");
+        id = UUID.randomUUID();
         user = User.builder().name("Daniel").email("daniel@example").build();
         userDTO = new UserDTO();
         userDTO.setName("Daniel");

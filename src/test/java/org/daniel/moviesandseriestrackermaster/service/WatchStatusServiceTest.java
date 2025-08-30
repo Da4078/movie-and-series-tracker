@@ -51,8 +51,8 @@ public class WatchStatusServiceTest {
 
     @BeforeEach
     void set_up(){
-        userId = UUID.fromString("578ad8cf-fcd2-4e43-8deb-926d496f1996");
-        contentId = UUID.fromString("578ad8cf-fcd2-4e43-8deb-926d496f1996");
+        userId = UUID.randomUUID();
+        contentId = UUID.randomUUID();
 
         user = new User();
         user.setId(userId);

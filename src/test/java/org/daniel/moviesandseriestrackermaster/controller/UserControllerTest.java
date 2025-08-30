@@ -1,39 +1,47 @@
 package org.daniel.moviesandseriestrackermaster.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.daniel.moviesandseriestrackermaster.dto.UserDTO;
 import org.daniel.moviesandseriestrackermaster.models.User;
 import org.daniel.moviesandseriestrackermaster.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(UserController.class)
 public class UserControllerTest {
-    @Mock
-    private UserService userService;
 
-    @InjectMocks
-    private UserController userController;
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserService userService;
 
     private UUID userId;
     private User user;
     private UserDTO userDTO;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+
+
     @BeforeEach
     void setUp() {
-        userId = UUID.fromString("578ad8cf-fcd2-4e43-8deb-926d496f1996");
+        userId = UUID.randomUUID();
         userDTO = new UserDTO("Daniel", "daniel@example.com");
         user = User.builder()
                 .id(userId)
@@ -43,47 +51,46 @@ public class UserControllerTest {
     }
 
     @Test
-    void should_create_user() {
-        when(userService.createUser(userDTO)).thenReturn(user);
+    void should_create_user() throws Exception{
+        when(userService.createUser(any(UserDTO.class))).thenReturn(user);
 
-        ResponseEntity<User> response = userController.createUser(userDTO);
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId.toString()))
+                .andExpect(jsonPath("$.name").value("Daniel"))
+                .andExpect(jsonPath("$.email").value("daniel@example.com"));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(user, response.getBody());
-        verify(userService).createUser(userDTO);
+
+
     }
 
     @Test
-    void should_get_user_by_id_found() {
+    void should_get_user_by_id_found() throws Exception{
         when(userService.getUserById(userId)).thenReturn(Optional.of(user));
 
-        ResponseEntity<User> response = userController.getUserById(userId);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(user, response.getBody());
-        verify(userService).getUserById(userId);
+        mockMvc.perform(get("/api/users/{id}", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId.toString()))
+                .andExpect(jsonPath("$.name").value("Daniel"))
+                .andExpect(jsonPath("$.email").value("daniel@example.com"));
     }
 
     @Test
-    void should_get_user_by_id_not_found() {
+    void should_get_user_by_id_not_found()throws Exception {
         when(userService.getUserById(userId)).thenReturn(Optional.empty());
 
-        ResponseEntity<User> response = userController.getUserById(userId);
+        mockMvc.perform(get("/api/users/{id}", userId)).andExpect(status().isNotFound());
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(userService).getUserById(userId);
     }
 
     @Test
-    void should_find_user_by_email() {
+    void should_find_user_by_email()throws Exception {
         when(userService.getUserByEmail("daniel@example.com")).thenReturn(Optional.of(user));
-
-        ResponseEntity<Optional<User>> response = userController.findByEmail("daniel@example.com");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody().isPresent());
-        assertEquals(user, response.getBody().get());
-        verify(userService).getUserByEmail("daniel@example.com");
+        mockMvc.perform(get("/api/users/email/{email}", userDTO.getEmail()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Daniel"))
+                .andExpect(jsonPath("$.email").value("daniel@example.com"));
     }
 }

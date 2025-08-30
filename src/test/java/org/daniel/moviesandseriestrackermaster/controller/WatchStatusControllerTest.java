@@ -1,32 +1,40 @@
 package org.daniel.moviesandseriestrackermaster.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.daniel.moviesandseriestrackermaster.dto.WatchStatusDTO;
 import org.daniel.moviesandseriestrackermaster.enums.WatchStatusEnum;
+import org.daniel.moviesandseriestrackermaster.models.Movie;
+import org.daniel.moviesandseriestrackermaster.models.User;
 import org.daniel.moviesandseriestrackermaster.models.WatchStatus;
 import org.daniel.moviesandseriestrackermaster.service.WatchStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(WatchStatusController.class)
 public class WatchStatusControllerTest {
-    @Mock
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
     private WatchStatusService watchStatusService;
 
-    @InjectMocks
-    private WatchStatusController watchStatusController;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private UUID userId;
     private UUID contentId;
@@ -35,42 +43,41 @@ public class WatchStatusControllerTest {
 
     @BeforeEach
     void setUp() {
-        userId = UUID.fromString("578ad8cf-fcd2-4e43-8deb-926d496f1996");;
+        userId = UUID.randomUUID();
+        contentId = UUID.randomUUID();
 
-        watchStatusDTO = new WatchStatusDTO(WatchStatusEnum.WATCHING);
+        User user = User.builder().id(userId).build();
+        Movie movie = Movie.builder().id(contentId).build();
+
+        watchStatusDTO = new WatchStatusDTO(WatchStatusEnum.WATCHED);
 
         watchStatus = WatchStatus.builder()
-                .id(userId)
-                .watchStatusEnum(WatchStatusEnum.WATCHING)
+                .id(UUID.randomUUID())
+                .user(user)
+                .movie(movie)
+                .watchStatusEnum(WatchStatusEnum.WATCHED)
                 .build();
     }
 
     @Test
-    void should_mark_status() {
-        when(watchStatusService.markStatus(userId, contentId, WatchStatusEnum.WATCHING))
+    void should_mark_status() throws Exception {
+        when(watchStatusService.markStatus(any(), any(), any()))
                 .thenReturn(watchStatus);
 
-        ResponseEntity<WatchStatus> response =
-                watchStatusController.markStatus(userId, contentId, watchStatusDTO);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(watchStatus, response.getBody());
-        verify(watchStatusService).markStatus(userId, contentId, WatchStatusEnum.WATCHING);
+        mockMvc.perform(put("/api/watch-status/{userId}/{contentId}", userId, contentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(watchStatusDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.watchStatusEnum").value("WATCHED"));
     }
 
     @Test
-    void should_get_by_status() {
-        List<WatchStatus> statuses = List.of(watchStatus);
-        when(watchStatusService.filterByStatus(userId, WatchStatusEnum.WATCHING))
-                .thenReturn(statuses);
+    void should_get_status_by_user_and_enum() throws Exception {
+        when(watchStatusService.filterByStatus(userId, WatchStatusEnum.WATCHED))
+                .thenReturn(List.of(watchStatus));
 
-        ResponseEntity<List<WatchStatus>> response =
-                watchStatusController.getByStatus(userId, WatchStatusEnum.WATCHING);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
-        assertEquals(watchStatus, response.getBody().get(0));
-        verify(watchStatusService).filterByStatus(userId, WatchStatusEnum.WATCHING);
+        mockMvc.perform(get("/api/watch-status/{userId}/{status}", userId, "WATCHED"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].watchStatusEnum").value("WATCHED"));
     }
 }
-
